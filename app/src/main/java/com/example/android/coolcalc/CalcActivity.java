@@ -183,26 +183,32 @@ public class CalcActivity extends Activity {
     }//onCreate()
 
     /**
-     * process all string pass from action listener
+     * Process all strings passes from action listener. Ensure first input is an numberic
+     * before passing it to getNumAndOperator().
      * @param getDigit
      */
     void numberPressed(String getDigit){
 
         if(!firstLetter){
             if(TextUtils.isDigitsOnly(getDigit)) {
-                getNumAndOperation(getDigit);
+                getNumAndOperator(getDigit);
                 firstLetter = true;
             }
             else
                 resultView.setText("Enter Number");
         }
         else {
-            getNumAndOperation(getDigit);
+            getNumAndOperator(getDigit);
         }
 
     }//numberPressed
 
-    void getNumAndOperation(String getDigit){
+    /**
+     * Check for non empty string and pass to addDigitAndDisplayText(), add to getOp
+     * upon encounter the 4 operators.
+     * @param getDigit
+     */
+    void getNumAndOperator(String getDigit){
 
         if(!getDigit.equals(""))
             if(getDigit.equals("/")){
@@ -231,24 +237,31 @@ public class CalcActivity extends Activity {
                 }
             }
             else{
+                //if calBtn not press
                 if(!resultSet) {
                     storeNum.append(getDigit);
                     doubleOperator = false;
                     resultSet = false;
                     displayText(getDigit);
-                    printArray();
+                    //printArray();
                 }
                 else {
                     clearNumber();
                     storeNum.append(getDigit);
                     displayText(getDigit);
                     firstLetter = true;
-                    printArray();
+                    //printArray();
 
                 }
             }
     }//getNumAndOperation()
 
+    /**
+     * Call addDigit() and displayText(). Set doubleOperator to track
+     * for double operator enter. Reset resultSet to allow continous
+     * calculation.
+     * @param getDigit
+     */
     void addDigitAndDisplayText(String getDigit){
         addDigit();
         displayText(getDigit);
@@ -256,47 +269,63 @@ public class CalcActivity extends Activity {
         resultSet = false;
     }//addDigitAndDisplayText()
 
+    /**
+     * Append and display running input to screen
+     * @param getDigit
+     */
 
     void displayText(String getDigit) {
         if (!doubleOperator){
-            System.out.println("DT:" + getDigit);
+            //System.out.println("DT:" + getDigit);
             runningNumber.append(getDigit);
             resultView.setText(runningNumber.toString());
         }
     }//displayText
 
+    /**
+     * convert string to double and add to storeNum.
+     */
 
     void addDigit(){
         if(storeNum.length() > 0 ) {
             getNum.add(Double.valueOf(storeNum.toString()));
             storeNum.setLength(0);
-            printArray();
+            //printArray();
         }
     }//addDigit()
 
 
+    /**
+     * Get the last set of numbers and pass to processOperator() to
+     *  process multiple, divide, plus and substraction when user
+     *  press the calBtn.
+     */
     void processCal(){
         if(storeNum.length() > 0 ) {
             getNum.add(Double.valueOf(storeNum.toString()));
             storeNum.setLength(0);
             //System.out.println("storeNum Length:" + storeNum.length());
+            //printArray();
 
-            printArray();
-
-            processOperation("*");
-            processOperation("/");
-            processOperation("+");
-            processOperation("-");
+            processOperator("*");
+            processOperator("/");
+            processOperator("+");
+            processOperator("-");
 
             setResult();
         }
-
     }//processCall
 
-    void processOperation(String operation) {
 
-        while(getOp.contains(operation)){
-            int pos = getOp.indexOf(operation);
+    /**
+     * Get the 1st and 2nd set of numbers to perform the respective
+     * mathematical operation according to the operator.
+     * @param operator
+     */
+    void processOperator(String operator) {
+
+        while(getOp.contains(operator)){
+            int pos = getOp.indexOf(operator);
             getOp.remove(pos);
 
             double first = getNum.get(pos);
@@ -306,22 +335,25 @@ public class CalcActivity extends Activity {
             getNum.remove(pos);
             double res;
 
-            if(operation.equals("*"))
+            if(operator.equals("*"))
                  res = first*sec;
-            else if(operation.equals("/"))
+            else if(operator.equals("/"))
                  res = first/sec;
-            else if(operation.equals("+"))
+            else if(operator.equals("+"))
                 res = first+sec;
             else
                 res = first-sec;
 
             getNum.add(pos,res);
 
-            System.out.println("First:" + first+ " Second: "+sec+ " Operation: "+operation  + " result: " + res);
-            printArray();
+            //System.out.println("First:" + first+ " Second: "+sec+ " Operation: "+operation  + " result: " + res);
+            //printArray();
         }
     }//processDivMulti()
 
+    /**
+     * Dsiply calculated result into resultView and running number
+     */
     void setResult(){
         String result = String.format("%.5f",getNum.get(0));
         resultView.setText(result);
@@ -330,11 +362,19 @@ public class CalcActivity extends Activity {
         resultSet = true;
     }//setResult()
 
+
+    /**
+     * print items in getNum and getOp
+     */
     void printArray(){
         System.out.println(getNum);
         System.out.println(getOp);
     }//printArray
 
+
+    /**
+     * clear runningNumber and call clearStoringVars()
+     */
 
     void clearNumber(){
         runningNumber.setLength(0);
@@ -342,6 +382,10 @@ public class CalcActivity extends Activity {
         clearStoringVars();
     }//clearNumber
 
+
+    /**
+     * Clear all variables
+     */
 
     void clearStoringVars() {
         storeNum.setLength(0);
